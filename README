@@ -1,0 +1,8 @@
+Problem:
+I need to convert a bunch of files from mp3 to ogg while keeping the id3tags
+
+This script does that, but I think it might need some modifications. It's working fine with me, hope it would be helpful, and any input is appreciated.
+
+This might be my first ruby script, so don't bash me if you don't like the code :-)
+
+in order to work, this script needs mplayer, oggenc, and id3tool.
