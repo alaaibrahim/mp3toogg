@@ -2,9 +2,9 @@
 
 require "tmpdir"
 require "thread"
+require "id3lib"
 
 class Convertor
-  @@id3tool = "/usr/bin/id3tool"
   @@mplayer = "/usr/bin/mplayer"
   @@oggenc = "/usr/bin/oggenc"
   @@ogg_dir = ENV["HOME"] + "/Music"
@@ -15,19 +15,13 @@ class Convertor
   end
 
   def get_id3
-    command = "#{@@id3tool} \"#{@original_file_name}\""
-    result = `#{command}`
-    result.each_line do |line|
-      line.gsub!(/^\s+|\s+$/,'')
-      value = line.gsub(/^[^:]+:\s*/,'')
-      @id3_title = value if line =~ /^Song Title:/i
-      @id3_artist = value if line =~ /^Artist:/i
-      @id3_album = value if line =~ /^Album:/i
-      @id3_track = value if line =~ /^Track:/i
-      @id3_year = value if line =~ /^Year:/i
-      @id3_genre = value if line =~ /^Genre:/i
-      @id3_note = value if line =~ /^Note:/i
-    end
+    tag = ID3Lib::Tag.new(@original_file_name)
+    @id3_title = tag.title
+    @id3_artist = tag.artist
+    @id3_album = tag.album
+    @id3_track = tag.track
+    @id3_year = tag.year
+    @id3_genre = ID3Lib::Info::Genres[tag.genre.sub('(','').sub(')','').to_i]
   end
 
   def convert_to_pcm
@@ -48,7 +42,6 @@ class Convertor
     command += " -N \"#{@id3_track}\"" unless @id3_track.nil?
     command += " -d \"#{@id3_year}\"" unless @id3_year.nil?
     command += " -G \"#{@id3_genre}\"" unless @id3_genre.nil?
-    command += " -c \"#{@id3_note}\"" unless @id3_note.nil?
     command += " 2>&1"
     `#{command}`
     @ogg_file_size = File.stat(@ogg_file_name).size
