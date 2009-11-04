@@ -21,7 +21,7 @@ class Convertor
     @id3_album = tag.album
     @id3_track = tag.track
     @id3_year = tag.year
-    @id3_genre = ID3Lib::Info::Genres[tag.genre.sub('(','').sub(')','').to_i]
+    @id3_genre = ID3Lib::Info::Genres[tag.genre.sub('(','').sub(')','').to_i] unless tag.genre.nil?
   end
 
   def convert_to_pcm
